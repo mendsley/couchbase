@@ -18,6 +18,7 @@ class Chef
           @current_resource.type bucket_type
           @current_resource.memory_quota_mb bucket_memory_quota_mb
           @current_resource.replicas bucket_replicas
+		  @current_resource.eviction_policy bucket_eviction_policy
         end
       end
 
@@ -26,6 +27,8 @@ class Chef
           create_bucket
         elsif @current_resource.memory_quota_mb != new_memory_quota_mb
           modify_bucket
+		elsif @current_resource.eviction_policy != @new_resource.eviction_policy
+		  modify_bucket
         end
       end
 
@@ -40,7 +43,8 @@ class Chef
       def modify_bucket
         post "/pools/#{@new_resource.cluster}/buckets/#{@new_resource.bucket}", modify_params
         new_resource.updated_by_last_action true
-        Chef::Log.info "#{new_resource} memory_quota_mb changed to #{new_memory_quota_mb}"
+		Chef::Log.info "#{new_resource} memory_quota_mb changed to #{new_memory_quota_mb}"
+		Chef::Log.info "#{new_resource} eviction_policy changed to #{@new_resource.eviction_policy}"
       end
 
       def create_params
@@ -51,6 +55,7 @@ class Chef
           "name" => new_resource.bucket,
           "ramQuotaMB" => new_memory_quota_mb,
           "replicaNumber" => new_resource.replicas || 0,
+		  "evictionPolicy" => new_resource.eviction_policy,
         }
       end
 
@@ -61,6 +66,7 @@ class Chef
       def modify_params
         {
           "ramQuotaMB" => new_memory_quota_mb,
+		  "evictionPolicy" => new_resource.eviction_policy,
         }
       end
 
@@ -79,6 +85,10 @@ class Chef
       def bucket_type
         bucket_data["bucketType"] == "membase" ? "couchbase" : bucket_data["bucketType"]
       end
+
+	  def bucket_eviction_policy
+		  bucket_data["evictionPolicy"]
+	  end
 
       def bucket_data
         return @bucket_data if instance_variable_defined? "@bucket_data"

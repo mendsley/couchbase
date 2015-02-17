@@ -47,6 +47,10 @@ class Chef
         set_or_return(:saslpassword, arg, :kind_of => String, :default => "")
       end
 
+	  def eviction_policy(arg=nil)
+		  set_or_return(:evictionpolicy, arg, :kind_of => String, :default => "valueOnly")
+	  end
+
       def initialize(*)
         super
         @action = :create
