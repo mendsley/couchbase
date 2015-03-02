@@ -131,28 +131,30 @@ service "couchbase-server" do
   notifies :create, "ruby_block[block_until_operational]", :immediately
 end
 
-couchbase_node "self" do
-  database_path node['couchbase']['server']['database_path']
-  index_path node['couchbase']['server']['index_path']
+if node['couchbase']['server']['create_default_node']
+	couchbase_node "self" do
+	  database_path node['couchbase']['server']['database_path']
+	  index_path node['couchbase']['server']['index_path']
 
-  username node['couchbase']['server']['username']
-  password node['couchbase']['server']['password']
-end
+	  username node['couchbase']['server']['username']
+	  password node['couchbase']['server']['password']
+	end
 
-couchbase_cluster "default" do
-  memory_quota_mb node['couchbase']['server']['memory_quota_mb']
+	couchbase_cluster "default" do
+	  memory_quota_mb node['couchbase']['server']['memory_quota_mb']
 
-  username node['couchbase']['server']['username']
-  password node['couchbase']['server']['password']
-end
+	  username node['couchbase']['server']['username']
+	  password node['couchbase']['server']['password']
+	end
 
-couchbase_settings "web" do
-  settings({
-    "username" => node['couchbase']['server']['username'],
-    "password" => node['couchbase']['server']['password'],
-    "port" => 8091,
-  })
+	couchbase_settings "web" do
+	  settings({
+		"username" => node['couchbase']['server']['username'],
+		"password" => node['couchbase']['server']['password'],
+		"port" => 8091,
+	  })
 
-  username node['couchbase']['server']['username']
-  password node['couchbase']['server']['password']
+	  username node['couchbase']['server']['username']
+	  password node['couchbase']['server']['password']
+	end
 end

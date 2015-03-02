@@ -65,3 +65,4 @@ default['couchbase']['server']['memory_quota_mb'] = Couchbase::MaxMemoryQuotaCal
 default['couchbase']['server']['port'] = 8091
 
 default['couchbase']['server']['allow_unsigned_packages'] = true
+default['couchbase']['server']['create_default_node'] = true
