@@ -26,6 +26,8 @@
 
 ::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 
+include_recipe "runit"
+
 if Chef::Config[:solo]
   missing_attrs = %w{
     password
@@ -125,9 +127,9 @@ directory node['couchbase']['server']['index_path'] do
   recursive true
 end
 
-service "couchbase-server" do
-  supports :restart => true, :status => true
+runit_service "couchbase-server" do
   action [:enable, :start]
+  log false
 end
 
 log "waiting for couchbase" do

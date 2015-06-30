@@ -1,0 +1,27 @@
+#!/bin/sh
+exec 2>&1
+exec > /opt/couchbase/var/lib/couchbase/logs/start.log
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+DAEMON=/opt/couchbase/bin/couchbase-server
+PIDFILE=/opt/couchbase/var/lib/couchbase/couchbase-server.pid
+NODEFILE=/opt/couchbase/var/lib/couchbase/couchbase-server.node
+COOKIEFILE=/opt/couchbase/var/lib/couchbase/couchbase-server.cookie
+
+test -f $DAEMON || exit 0
+
+# Otherwise, RHEL (and apparently Fedora) tries to "help" and set soft
+# limit of core file size to 0 for daemons. It's done as part of
+# daemon shell function shortly after changing user. See MB-6601
+export DAEMON_COREFILE_LIMIT=unlimited
+
+touch $PIDFILE $NODEFILE $COOKIEFILE
+chown couchbase $PIDFILE $NODEFILE $COOKIEFILE
+
+cd /opt/couchbase/var/lib/couchbase
+
+ulimit -n 40960
+ulimit -c unlimited
+ulimit -l unlimited
+exec chpst -u couchbase:couchbase $DAEMON -- -noinput

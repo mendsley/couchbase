@@ -10,7 +10,7 @@ version          "1.3.0"
   supports os
 end
 
-%w{apt openssl windows yum}.each do |d|
+%w{apt openssl windows yum runit}.each do |d|
   depends d
 end
 
